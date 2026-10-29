@@ -9,8 +9,9 @@ import sys
 import tempfile
 import threading
 import time
+from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from acbr_printer import ErroAcbrImpressora, criar_impressora
 from acbr_printer import client
@@ -37,7 +38,13 @@ class ClientTests(unittest.TestCase):
             self.assertFalse(kwargs["shell"])
             self.assertNotIn("NPM_TOKEN", kwargs["env"])
             return REAL_POPEN([sys.executable, "-u", str(worker)], **kwargs)
-        self.patcher = patch.object(client.subprocess, "Popen", side_effect=launch)
+        # The client imports the shared stdlib module. Replacing its Popen
+        # attribute would also intercept platform.machine() helpers on Windows.
+        # Replace only the client's binding, keeping every other caller intact.
+        self.process_launcher = Mock(side_effect=launch)
+        process_api = SimpleNamespace(**vars(subprocess))
+        process_api.Popen = self.process_launcher
+        self.patcher = patch.object(client, "subprocess", process_api)
         self.patcher.start()
         self.instances = []
 
@@ -58,6 +65,21 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(raised.exception.codigo, code)
         self.assertEqual(raised.exception.resultado_incerto, uncertain)
         return raised.exception
+
+    def test_subprocess_mock_is_scoped_to_client_module(self):
+        self.assertIs(subprocess.Popen, REAL_POPEN)
+        self.assertIsNot(client.subprocess, subprocess)
+        self.assertIs(client.subprocess.Popen, self.process_launcher)
+        output = subprocess.check_output(
+            [sys.executable, "-c", "print('outside-client')"], text=True,
+        )
+        self.assertEqual(output.strip(), "outside-client")
+        self.assertEqual(self.launches, [])
+        self.process_launcher.assert_not_called()
+        with self.printer() as printer:
+            self.assertTrue(printer.capacidades()["sucesso"])
+        self.assertEqual(len(self.launches), 1)
+        self.process_launcher.assert_called_once()
 
     def test_queries_and_utf8_bytes_use_only_stdin(self):
         with self.printer() as printer:
