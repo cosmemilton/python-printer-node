@@ -7,4 +7,5 @@
 - Texto/XML somente pelo stdin do processo, sem shell; não registrar payloads, certificados ou segredos.
 - ENVIADO confirma o transporte, sem confirmação física. Manter resultadoIncerto em timeout/falha após início possível do envio.
 - Preservar licença, fontes correspondentes e todos os hashes do runtime. Não baixar binários automaticamente ao importar ou instalar o pacote.
-- Testar o wheel instalado em consumidor externo. Não publicar nem criar repositório remoto enquanto o usuário prepara os repositórios.
+- Testar o wheel instalado em consumidor externo. O usuário criou `cosmemilton/python-printer-node` e autorizou o envio dos fontes; o pacote continua `acbr-printer-python`, importado por `acbr_printer`.
+- A validação automática deve usar apenas workers fictícios, sem runtime nativo, hardware ou SEFAZ. Não publicar no PyPI nem disponibilizar outro runtime remoto sem solicitação do usuário.

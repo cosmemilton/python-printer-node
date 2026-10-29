@@ -1,0 +1,81 @@
+name: Validate Python printer client
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Python ${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.11', '3.13', '3.14']
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          architecture: x64
+      - name: Install client without runtime
+        run: python -m pip install --no-deps .
+      - name: Run tests with simulated workers only
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+
+  distribution:
+    name: Build and check installed wheel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+          architecture: x64
+      - name: Install build tools
+        run: python -m pip install build
+      - name: Build wheel and source distribution
+        run: python -m build
+      - name: Verify distribution contents
+        shell: python
+        run: |
+          from pathlib import Path, PurePosixPath
+          import tarfile
+          import zipfile
+
+          wheels = list(Path('dist').glob('*.whl'))
+          archives = list(Path('dist').glob('*.tar.gz'))
+          assert len(wheels) == len(archives) == 1
+          with zipfile.ZipFile(wheels[0]) as wheel:
+              wheel_names = wheel.namelist()
+              assert 'acbr_printer/py.typed' in wheel_names
+              assert 'acbr_printer/installer.py' in wheel_names
+              names = list(wheel_names)
+          with tarfile.open(archives[0], 'r:gz') as archive:
+              names += archive.getnames()
+          for name in names:
+              parts = PurePosixPath(name).parts
+              assert not {'runtime', 'vendor', '.git', '__pycache__', '.artifacts'} & set(parts), name
+              assert not name.lower().endswith(('.exe', '.dll', '.so', '.pfx', '.p12', '.key', '.pyc')), name
+          assert any(name.endswith('/runtime.lock.json') for name in names)
+          print('Wheel and sdist contain client sources, metadata and licenses; no runtime binary.')
+      - name: Install wheel in an external consumer
+        shell: bash
+        run: |
+          set -euo pipefail
+          wheel="$(find "$GITHUB_WORKSPACE/dist" -maxdepth 1 -name '*.whl' -print)"
+          consumer="$RUNNER_TEMP/acbr-printer-consumer"
+          python -m venv "$consumer"
+          "$consumer/bin/python" -m pip install --no-index --no-deps "$wheel"
+          cd "$RUNNER_TEMP"
+          "$consumer/bin/python" -c "from pathlib import Path; import acbr_printer; from acbr_printer import criar_impressora; assert 'site-packages' in Path(acbr_printer.__file__).parts; p=criar_impressora(); assert callable(p.danfe_pdf); p.fechar(); print('External wheel import passed without runtime.')"
+          "$consumer/bin/python" -m acbr_printer --help

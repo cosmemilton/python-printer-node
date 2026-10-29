@@ -3,7 +3,9 @@
 Componente independente de impressão para Python 3.11+, Windows e Linux x64.
 Usa ACBrPosPrinter para texto/ESC-POS e FortesReport para spooler, DANFE e PDF.
 API Python local **0.1.0**, motor auditado **0.1.2-local.1** e revisão ACBr **48590**.
-O projeto ainda está sendo preparado localmente; não afirma publicação no PyPI.
+Os fontes são mantidos no [repositório python-printer-node](https://github.com/cosmemilton/python-printer-node).
+O nome da distribuição continua `acbr-printer-python`, com importação por
+`acbr_printer`; esta versão ainda não foi publicada no PyPI.
 
 O módulo `acbr_printer` pode conviver com `acbr` do emissor `acbr-python`.
 Os componentes não exigem a instalação um do outro. O XML é o ponto de integração.
@@ -168,6 +170,14 @@ Ela cobre protocolo, limites, validações, timeout, envio incerto, fechamento,
 serialização por destino e instalação segura. O script `tests/native_offline.py`
 exercita o worker real apenas com bytes/PDF e exige um runtime já instalado.
 Os exemplos só enviam com `--enviar`; não os acrescente ao CI como impressão.
+
+O workflow `Validate Python printer client` executa os testes simulados em
+Windows e Linux, com Python 3.11, 3.13 e 3.14. Também constrói wheel/sdist,
+confere que binários e arquivos sensíveis conhecidos não entraram nos pacotes e instala
+o wheel em um consumidor separado para verificar importação e ajuda da CLI.
+O CI não instala runtime nativo, não acessa impressoras ou SEFAZ e não publica
+releases ou pacotes. A existência da matriz não substitui a confirmação do
+resultado de cada execução.
 
 Consulte `docs/VALIDACAO.md` para o estado dos testes. Licença LGPL-2.1-or-later;
 preserve `LICENSE`, `NOTICE`, fontes e avisos do runtime ao redistribuir.

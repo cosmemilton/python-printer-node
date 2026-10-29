@@ -20,8 +20,13 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Typing :: Typed",
 ]
+
+[project.urls]
+Repository = "https://github.com/cosmemilton/python-printer-node"
+Issues = "https://github.com/cosmemilton/python-printer-node/issues"
 
 [project.scripts]
 acbr-printer-python = "acbr_printer.__main__:main"
