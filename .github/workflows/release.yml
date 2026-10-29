@@ -1,0 +1,86 @@
+name: Publish Python printer client
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pypi-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-version:
+    name: Check release tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Require matching version tag
+        shell: python
+        env:
+          RELEASE_REF_TYPE: ${{ github.ref_type }}
+          RELEASE_REF_NAME: ${{ github.ref_name }}
+          RELEASE_REPOSITORY: ${{ github.repository }}
+        run: |
+          import os
+          from pathlib import Path
+          import tomllib
+
+          project = tomllib.loads(Path('pyproject.toml').read_text())['project']
+          assert os.environ['RELEASE_REPOSITORY'] == 'cosmemilton/python-printer-node'
+          assert os.environ['RELEASE_REF_TYPE'] == 'tag', 'Select a version tag for manual runs.'
+          assert project['name'] == 'acbr-printer-python'
+          assert os.environ['RELEASE_REF_NAME'] == 'v' + project['version'], 'Tag and package version differ.'
+          print('Publishing version ' + project['version'])
+
+  validate:
+    name: Validate release sources
+    needs: release-version
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    name: Build PyPI distributions
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Build and check metadata
+        run: |
+          python -m pip install build twine
+          python -m build
+          python -m twine check --strict dist/*
+      - uses: actions/upload-artifact@v7
+        with:
+          name: pypi-distributions
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Upload to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/acbr-printer-python/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: pypi-distributions
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

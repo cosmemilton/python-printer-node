@@ -2,35 +2,38 @@
 
 Componente independente de impressão para Python 3.11+, Windows e Linux x64.
 Usa ACBrPosPrinter para texto/ESC-POS e FortesReport para spooler, DANFE e PDF.
-API Python local **0.1.0**, motor auditado **0.1.2-local.1** e revisão ACBr **48590**.
+API Python **0.1.0**, motor auditado **0.1.2-local.1** e revisão ACBr **48590**.
 Os fontes são mantidos no [repositório python-printer-node](https://github.com/cosmemilton/python-printer-node).
 O nome da distribuição continua `acbr-printer-python`, com importação por
-`acbr_printer`; esta versão ainda não foi publicada no PyPI.
+`acbr_printer`.
 
 O módulo `acbr_printer` pode conviver com `acbr` do emissor `acbr-python`.
 Os componentes não exigem a instalação um do outro. O XML é o ponto de integração.
 Não é necessário Node.js, npm, Delphi ou um compilador para executar o cliente.
 O projeto é independente do Projeto ACBr e usa ferramentas livres, sem ACBr Pro.
 
-## Instalação local
+## Instalação
 
 ```sh
-python -m pip install .
+python -m pip install acbr-printer-python==0.1.0
 ```
 
-O wheel contém o cliente Python. O runtime é instalado **explicitamente por
-arquivo local**, sem rede ao importar, instalar ou usar este instalador:
+O wheel contém o cliente Python. Baixe o [bundle nativo auditado da release
+v0.1.0](https://github.com/cosmemilton/php-printer-node/releases/download/v0.1.0/acbr-printer-runtime-0.1.2-local.1.tgz)
+e instale o runtime **explicitamente por arquivo local**. Importar o cliente ou
+executar seu instalador não faz download do runtime:
 
 ```sh
 python -m acbr_printer instalar-runtime --arquivo acbr-printer-runtime-0.1.2-local.1.tgz --destino ./runtime-local
 python -m acbr_printer capacidades --runtime-directory ./runtime-local
 ```
 
-O artefato local inclui os motores Windows e Linux com a correção do nome do
+O artefato inclui os motores Windows e Linux com a correção do nome do
 trabalho do relatório de texto FortesReport. Ele mede **71.442.624 bytes** e
 o SHA256 esperado é `0aba5fb78b40099427a74076a70d4e8edcda3b8fa243a0f31a5db5c8d2e64093`.
-Ainda não existe release pública dessa revisão: omitir `--arquivo` retorna
-`RUNTIME_LOCAL_NAO_PUBLICADO`. Não há download ou fallback para o runtime Node
+Omitir `--arquivo` recusa a instalação e informa o endereço público para download
+manual; o código histórico `RUNTIME_LOCAL_NAO_PUBLICADO` é preservado por
+compatibilidade. Não há download automático ou fallback para o runtime Node
 0.1.1. O nome Node no histórico do motor indica a origem do código, sem exigir
 o interpretador Node na execução de PHP ou Python.
 A extração recusa links, travessia de diretórios, duplicatas e arquivos excessivos.
@@ -178,6 +181,32 @@ o wheel em um consumidor separado para verificar importação e ajuda da CLI.
 O CI não instala runtime nativo, não acessa impressoras ou SEFAZ e não publica
 releases ou pacotes. A existência da matriz não substitui a confirmação do
 resultado de cada execução.
+
+## Publicação no PyPI
+
+O workflow separado `.github/workflows/release.yml` publica por Trusted Publishing,
+sem token permanente. Na conta PyPI responsável, cadastre um **pending publisher**
+em [Publishing](https://pypi.org/manage/account/publishing/) com estes valores:
+
+| Campo | Valor |
+| --- | --- |
+| PyPI project name | `acbr-printer-python` |
+| GitHub owner | `cosmemilton` |
+| Repository name | `python-printer-node` |
+| Workflow name | `release.yml` |
+| Environment name | `pypi` |
+
+O ambiente GitHub `pypi` deve usar o mesmo nome. Antes da primeira tag, confira
+o acesso público ao bundle nativo auditado indicado na instalação; ele continua
+instalado explicitamente com `--arquivo`, separado do wheel.
+
+Uma tag `v` seguida da versão de `pyproject.toml` inicia a publicação. Uma execução
+manual também exige selecionar essa tag; branches são recusadas. O workflow
+confere nome e versão, executa novamente a matriz completa do CI e a validação do
+pacote instalado, constrói wheel/sdist e aplica `twine check --strict`. Somente
+depois o job de upload recebe `id-token: write`. Não há checkout nem build nesse
+job. O cadastro pending passa a ser um publisher normal na primeira publicação;
+ele não reserva o nome do projeto enquanto não houver upload.
 
 Consulte `docs/VALIDACAO.md` para o estado dos testes. Licença LGPL-2.1-or-later;
 preserve `LICENSE`, `NOTICE`, fontes e avisos do runtime ao redistribuir.

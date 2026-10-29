@@ -13,7 +13,7 @@ from .errors import ErroAcbrImpressora
 from .runtime import RUNTIME_VERSION, cache_directory, checked_member, platform_key, resolve_runtime
 
 APPROVED_FILE = "acbr-printer-runtime-0.1.2-local.1.tgz"
-APPROVED_URL = None  # Esta revisão ainda não tem release pública.
+APPROVED_URL = "https://github.com/cosmemilton/php-printer-node/releases/download/v0.1.0/acbr-printer-runtime-0.1.2-local.1.tgz"
 APPROVED_SHA256 = "0aba5fb78b40099427a74076a70d4e8edcda3b8fa243a0f31a5db5c8d2e64093"
 APPROVED_BYTES = 71442624
 
@@ -66,7 +66,7 @@ def instalar_runtime(arquivo: str | os.PathLike | None = None,
                      destino: str | os.PathLike | None = None) -> dict:
     """Instalação local explícita; nenhum download remoto nesta revisão."""
     if arquivo is None:
-        raise ErroAcbrImpressora("RUNTIME_LOCAL_NAO_PUBLICADO", "Este runtime ainda não foi publicado. Use --arquivo com " + APPROVED_FILE + ".")
+        raise ErroAcbrImpressora("RUNTIME_LOCAL_NAO_PUBLICADO", "Baixe explicitamente o runtime de " + APPROVED_URL + " e use --arquivo com " + APPROVED_FILE + ".")
     destination = Path(destino) if destino is not None else cache_directory()
     if destination.is_symlink():
         raise ErroAcbrImpressora("DESTINO_INVALIDO", "O destino de instalação não pode ser um link.")
