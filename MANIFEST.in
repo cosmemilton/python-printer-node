@@ -1,0 +1,7 @@
+include LICENSE NOTICE README.md AGENTS.md
+recursive-include examples *.py
+recursive-include tests *.py
+recursive-include tests/fixtures *.json *.xml
+recursive-include docs *.md
+include runtime.lock.json
+recursive-include native *.md *.patch

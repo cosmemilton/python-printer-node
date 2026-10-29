@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acbr-printer-python"
+version = "0.1.0"
+description = "Impressão ESC/POS, FortesReport e DANFE para Python com ACBr Free Pascal/Lazarus"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "LGPL-2.1-or-later"
+license-files = ["LICENSE", "NOTICE"]
+dependencies = []
+keywords = ["acbr", "printer", "escpos", "danfe", "nfce"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+]
+
+[project.scripts]
+acbr-printer-python = "acbr_printer.__main__:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["acbr_printer", "acbr_printer.*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+acbr_printer = ["py.typed"]

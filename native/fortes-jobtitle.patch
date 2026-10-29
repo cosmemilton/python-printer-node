@@ -1,0 +1,13 @@
+--- a/native/acbr_printer_engine.pas
++++ b/native/acbr_printer_engine.pas
+@@ -442,6 +442,10 @@
+ begin
+   RequireInstalledPrinter;
+   Report := TRLReport.Create(nil);
++  // Fortes BeginDoc uses Owner.Name when JobTitle is empty; this report has no owner.
++  Report.Name := 'ACBrTextoSpooler';
++  Report.Title := 'ACBr Printer';
++  Report.JobTitle := 'ACBr Printer - Texto';
+   Lines := TStringList.Create;
+   SourceLines := TStringList.Create;
+   try

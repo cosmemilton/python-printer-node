@@ -1,0 +1,48 @@
+{
+  "formato": 1,
+  "linguagem": "PYTHON",
+  "texto": "TESTE NAO FISCAL\nACBr Printer PYTHON\nTipo 0 - texto\n\n\n",
+  "textoSpooler": "TESTE NAO FISCAL\nACBr Printer PYTHON\nFortesReport / spooler Windows\nTexto grafico de teste\n",
+  "avancado": "</zera></fn></ce><n>TESTE ESPECIALIZADO</n>\nACBr Printer PYTHON - tipo 8\nTESTE NAO FISCAL\n</ae>------------------------------------------------\n01. NEGRITO / NORMAL\nTexto normal\n<n>Texto em NEGRITO</n>\nTexto normal novamente\n\n02. FORMATOS DE FONTE\n<s>Texto sublinhado</s>\n<e>EXPANDIDO</e>\n<a>ALTURA DUPLA</a>\n<e><a>GRANDE</a></e>\n<c>Fonte condensada: 1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ</c>\n<in>TEXTO INVERTIDO</in>\n</fn>\n03. ALINHAMENTO\n</ae>ESQUERDA\n</ce>CENTRO\n</ad>DIREITA\n</ae>\n04. ACENTOS\nAção, café, açúcar, ç, ã, ê.\n\n</ce>05. QR CODE\n<qrcode_tipo>2</qrcode_tipo>\n<qrcode_largura>5</qrcode_largura>\n<qrcode_error>1</qrcode_error>\n<qrcode>ACBR-PYTHON-TIPO8</qrcode>\nLeitura esperada:\nACBR-PYTHON-TIPO8\n\n06. CODE 128\n<barra_mostrar>1</barra_mostrar>\n<barra_largura>2</barra_largura>\n<barra_altura>70</barra_altura>\n<code128>ACBRPY123</code128>\nLeitura: ACBRPY123\n\n07. EAN-13\n<ean13>789123456789</ean13>\nLeitura: 7891234567895\n\n</fn></ae>------------------------------------------------\n</ce>08. FIM - CORTE TOTAL\nO papel deve cortar abaixo desta mensagem.\n</ae>\n\n</corte_total>",
+  "configuracaoAvancada": {
+    "modo": "escpos",
+    "porta": "\\\\localhost\\elgin",
+    "tipo": 8,
+    "interpretarTags": true,
+    "cortarPapel": true,
+    "colunas": 48,
+    "linhasEntreCupons": 5
+  },
+  "destinoEscpos": "\\\\localhost\\elgin",
+  "impressoraSpooler": "ELGIN",
+  "leituras": {
+    "qrCode": "ACBR-PYTHON-TIPO8",
+    "code128": "ACBRPY123",
+    "ean13": "7891234567895"
+  },
+  "comandosHex": {
+    "negrito": "1b2108",
+    "sublinhado": "1b2180",
+    "expandido": "1b2120",
+    "alturaDupla": "1b2110",
+    "fonteGrande": "1b2130",
+    "condensado": "1b2101",
+    "invertido": "1d4201",
+    "esquerda": "1b6100",
+    "centro": "1b6101",
+    "direita": "1b6102",
+    "qrcode": "1d286b",
+    "code128": "1d6b49",
+    "ean13": "1d6b43",
+    "corteTotal": "1d5600"
+  },
+  "totalCortes": 1,
+  "abrirGaveta": false,
+  "beep": false,
+  "referenciaNode": {
+    "pacote": "cosmemilton-acbr-printer-node@0.1.1",
+    "bytes": 879,
+    "sha256": "9a1d1da44ece53b8fabb380896c87a5145d3b530617ea69b80f20c6e2c78584a",
+    "arquivo": "python-avancado-node-reference.bin"
+  }
+}
